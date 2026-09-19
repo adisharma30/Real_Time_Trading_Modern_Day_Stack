@@ -11,10 +11,10 @@ SYMBOLS = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
 try:
     producer=KafkaProducer(
         bootstrap_servers=["localhost:29092"],
-        api_version=(7, 4, 1),
-        connections_max_idle_ms=5400,
-        max_block_ms=3000,
-        request_timeout_ms=300,
+        # api_version=(7, 4, 1),
+        # connections_max_idle_ms=5400,
+        # max_block_ms=3000,
+        # request_timeout_ms=300,
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
     print("Connected to Kafka at localhost:29092", flush=True)
@@ -22,10 +22,10 @@ except Exception as e:
     print(f"Failed to connect to localhost:29092, trying host.docker.internal:29092: {e}", flush=True)
     producer=KafkaProducer(
         bootstrap_servers=["host.docker.internal:29092"],
-        api_version=(7, 4, 1),
-        connections_max_idle_ms=54000,
-        max_block_ms=3000,
-        request_timeout_ms=3000,
+        # api_version=(7, 4, 1),
+        # connections_max_idle_ms=54000,
+        # max_block_ms=3000,
+        # request_timeout_ms=3000,
         value_serializer=lambda v: json.dumps(v).encode('utf-8')
     )
 
@@ -51,6 +51,6 @@ while True:
         quote = fetch_quote(symbol)
         if quote:
             print(f"Producing: {quote}", flush=True)
-            producer.send("stock_quotes", value=quote)
+            producer.send("stock-quotes", value=quote)
             print(f"Sent quote for {symbol}: {quote}", flush=True)
     time.sleep(6)  # Fetch quotes every 60 seconds

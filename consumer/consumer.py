@@ -4,7 +4,7 @@ import json
 from kafka import KafkaConsumer
 
 s3_client = boto3.client('s3',
-                         endpoint_url='https://localhost:9002',
+                         endpoint_url='https://localhost:9003',
                          aws_access_key_id='admin',
                          aws_secret_access_key='password123')
 
@@ -12,10 +12,10 @@ bucket_name='bronze-transaction'
 
 
 consumer = KafkaConsumer(
-    'stock_quotes',
+    'stock-quotes',
     bootstrap_servers=['host.docker.internal:29092'],
     enable_auto_commit=True,
-    group_id='bronze_transaction_group',
+    group_id='bronze-consumer',
     auto_offset_reset='earliest',
     api_version=(7, 4, 1),
     value_deserializer=lambda v: json.loads(v.decode('utf-8'))
