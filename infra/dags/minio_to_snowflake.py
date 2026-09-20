@@ -1,6 +1,8 @@
 import os
 import boto3
 import snowflake.connector
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.backends import default_backend
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
@@ -9,10 +11,10 @@ MINIO_ENDPOINT = "http://minio:9000"
 MINIO_ACCESS_KEY = "admin"
 MINIO_SECRET_KEY = "password123"
 BUCKET = "bronze-transaction"
-LOCAL_DIR = "/tmp/minio_downloads"  # use absolute path for Airflow
+LOCAL_DIR = "C:/Users/91787/Python_Repo/Real_Time_Trading_Mds/tmp/minio_downloads"  # use absolute path for Airflow
 
 SNOWFLAKE_USER = "ADISHARMA"
-SNOWFLAKE_PASSWORD = "z4mWVJMdVetXX95"
+SNOWFLAKE_PRIVATE_KEY_PATH = "/opt/airflow/secrets/rsa_key.p8"
 SNOWFLAKE_ACCOUNT = "oc33285.eu-central-1"
 SNOWFLAKE_WAREHOUSE = "COMPUTE_WH"
 SNOWFLAKE_DB = "STOCKS_MDS"
@@ -42,9 +44,22 @@ def load_to_snowflake(**kwargs):
         print("No files to load.")
         return
 
+    with open(SNOWFLAKE_PRIVATE_KEY_PATH, "rb") as key_file:
+        p_key = serialization.load_pem_private_key(
+            key_file.read(),
+            password=None,
+            backend=default_backend()
+        )
+
+    pkb = p_key.private_bytes(
+        encoding=serialization.Encoding.DER,
+        format=serialization.PrivateFormat.PKCS8,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+
     conn = snowflake.connector.connect(
         user=SNOWFLAKE_USER,
-        password=SNOWFLAKE_PASSWORD,
+        private_key=pkb,
         account=SNOWFLAKE_ACCOUNT,
         warehouse=SNOWFLAKE_WAREHOUSE,
         database=SNOWFLAKE_DB,
@@ -69,7 +84,7 @@ def load_to_snowflake(**kwargs):
 default_args = {
     "owner": "airflow",
     "depends_on_past": False,
-    "start_date": datetime(2025, 9, 9),
+    "start_date": datetime(2026, 9, 20),
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
 }
