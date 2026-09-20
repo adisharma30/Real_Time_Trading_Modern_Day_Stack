@@ -9,4 +9,4 @@ v:pc::float as prev_close,
 v:t::timestamp as market_timestamp,
 v:symbol::string as symbol,
 v:fetched_at::timestamp as fetched_at
-from {{source('bronze', 'BRONZE_STOCK_QUOTE_RAW')}}
+from {{source('raw', 'bronze_stock_quote_raw')}}

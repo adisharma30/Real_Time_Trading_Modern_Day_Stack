@@ -4,4 +4,4 @@ sources:
     database: STOCKS_MDS
     schema: COMMON
     tables:
-      - name: BRONZE_STOCK_QUOTE_RAW
+      - name: bronze_stock_quote_raw

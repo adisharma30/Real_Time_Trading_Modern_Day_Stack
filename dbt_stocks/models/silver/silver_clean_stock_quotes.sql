@@ -6,7 +6,7 @@ ROUND(day_low,2) AS day_low,
 ROUND(day_open,2) AS day_open,
 ROUND(prev_close,2) AS prev_close,
 change_amount,
-ROUND(change_percent,2) AS change_percent,
+ROUND(change_percentage,2) AS change_percentage,
 market_timestamp,
 fetched_at
 FROM {{ ref('bronze_stg_stock_quotes') }}
