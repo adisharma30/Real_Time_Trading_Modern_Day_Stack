@@ -4,3 +4,18 @@ __pycache__/
 
 infra/logs/
 infra/dags/__pycache__/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+infra/secrets/*
+!infra/secrets/.gitignore
+*.p8
+
+# Runtime and dbt output
+logs/
+*.log
+dbt_stocks/target/
+dbt_stocks/dbt_packages/
+dbt_stocks/logs/

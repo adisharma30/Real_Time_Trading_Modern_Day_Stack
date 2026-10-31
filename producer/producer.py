@@ -1,9 +1,13 @@
 import time
 import json
+import os
 import requests
 from kafka import KafkaProducer
 
-API_key= "daetkcpr01qqo7nu41tgdaetkcpr01qqo7nu41u0"
+API_key = os.getenv("FINNHUB_API_KEY")
+if not API_key:
+    raise RuntimeError("Set the FINNHUB_API_KEY environment variable.")
+
 API_url = "https://finnhub.io/api/v1/quote"
 SYMBOLS = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
 
@@ -32,17 +36,23 @@ except Exception as e:
 print("Producer started successfully!", flush=True)
 
 def fetch_quote(symbol):
-    url=f"{API_url}?symbol={symbol}&token={API_key}"
     try:
-        print(f"Fetching data for {symbol} from {url}", flush=True)
-        response=requests.get(url, timeout=5)
+        print(f"Fetching data for {symbol} from Finnhub", flush=True)
+        response = requests.get(
+            API_url,
+            params={"symbol": symbol, "token": API_key},
+            timeout=5
+        )
         response.raise_for_status()
         data = response.json()
         data['symbol'] = symbol
         data['fetched_at'] = int(time.time())
         return data
     except Exception as e:
-        print(f"Error fetching data for {symbol}: {e}", flush=True)
+        print(
+            f"Error fetching data for {symbol}: {type(e).__name__}",
+            flush=True
+        )
         return None
 
 while True:
@@ -53,4 +63,4 @@ while True:
             print(f"Producing: {quote}", flush=True)
             producer.send("stock-quotes", value=quote)
             print(f"Sent quote for {symbol}: {quote}", flush=True)
-    time.sleep(6)  # Fetch quotes every 60 seconds
+    time.sleep(6)
